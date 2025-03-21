@@ -1,0 +1,164 @@
+import random
+
+#__author__  = Adam Åkerlund
+#__version__ = 3.11.4
+#__email__   = adam.akerlund@elev.ga.ntig.se
+
+
+import os
+import random
+
+# Define the high score file path dynamically so it works for any Windows user
+HIGHSCORE_FILE = os.path.join(os.path.expanduser("~"), "Desktop", "HIGHSCORE_FILE.txt")
+
+# Ensure the file exists before reading/writing
+if not os.path.exists(HIGHSCORE_FILE):
+    with open(HIGHSCORE_FILE, "w") as file:
+        pass  # Create an empty file
+
+def save_highscore(username, score, game_type):
+    """Saves the high score to a file."""
+    with open(HIGHSCORE_FILE, "a") as file:
+        file.write(f"{username} | {score} | {game_type}\n")
+
+def display_highscores():
+    """Displays the high scores from the file."""
+    try:
+        with open(HIGHSCORE_FILE, "r") as file:
+            scores = file.readlines()
+        
+        if not scores:
+            print("\n🏆 No high scores yet. Be the first!\n")   
+            return
+
+        print("\n🏆 High Scores 🏆")
+        sorted_scores = sorted(scores, key=lambda x: int(x.split(" | ")[1].split("/")[0]), reverse=True)
+        
+        for entry in sorted_scores[:10]:
+            username, score, game_type = entry.strip().split(" | ")
+            print(f"{username} - {score} points ({game_type})")
+
+    except FileNotFoundError:
+        print("\n🏆 No high scores yet. Be the first!\n")
+
+
+def mixed_questions_game():                     #All the mixed questions is stored in here
+    return [
+        {"question": "What is the capital of Australia?", "answer": "Canberra"},
+        {"question": "What is the largest planet in our solar system?", "answer": "Jupiter"},
+        {"question": "Who painted the Mona Lisa?", "answer": "Leonardo da Vinci"},
+        {"question": "What is the chemical symbol for gold?", "answer": "Au"},
+        {"question": "How many bones are in the human body?", "answer": 206},
+        {"question": "What is the fastest land animal?", "answer": "Cheetah"},
+        {"question": "In what year did the Titanic sink?", "answer": 1912},
+        {"question": "What is the hardest natural substance on Earth?", "answer": "Diamond"},
+        {"question": "Who wrote Romeo and Juliet?", "answer": "William Shakespeare"},
+        {"question": "How many continents are there in the world?", "answer": 7},
+        {"question": "What is the tallest mountain in the world?", "answer": "Mount Everest"},
+        {"question": "What is the currency of Japan?", "answer": "Yen"},
+        {"question": "What is the longest river in the world?", "answer": "The Nile"},
+        {"question": "Which planet is closest to the Sun?", "answer": "Mercury"},
+        {"question": "Who discovered penicillin?", "answer": "Alexander Fleming"},
+        {"question": "What is the smallest country in the world?", "answer": "Vatican City"},
+        {"question": "How many sides does a hexagon have?", "answer": 6},
+        {"question": "What is the square root of 144?", "answer": 12},
+        {"question": "Which ocean is the largest?", "answer": "The Pacific Ocean"},
+        {"question": "What is the main ingredient in guacamole?", "answer": "Avocado"}
+    ]
+
+def music_questions_game():                     #All the music questions is stored in here
+    return [
+        {"question": "Who is known as the King of Pop?", "answer": "Michael Jackson"},
+        {"question": "Which band released the album 'Abbey Road'?", "answer": "The Beatles"},
+        {"question": "What is the real name of the artist Eminem?", "answer": "Marshall Mathers"},
+        {"question": "Which classical composer became deaf later in life?", "answer": "Ludwig van Beethoven"},
+        {"question": "What is the best-selling album of all time?", "answer": "Thriller"},
+        {"question": "Which singer is known for hits like 'Rolling in the Deep' and 'Someone Like You'?", "answer": "Adele"},
+        {"question": "Which country did the EDM genre originate from?", "answer": "Germany"},
+        {"question": "Which artist sang 'Purple Rain'?", "answer": "Prince"},
+        {"question": "Which rapper released the album 'The College Dropout'?", "answer": "Kanye West"},
+        {"question": "What is the name of Beyoncé's fan base?", "answer": "Beyhive"},
+        {"question": "Which band performed 'Bohemian Rhapsody'?", "answer": "Queen"},
+        {"question": "Who was the lead singer of Nirvana?", "answer": "Kurt Cobain"},
+        {"question": "Which musical instrument has 88 keys?", "answer": "Piano"},
+        {"question": "Who is known for the hit 'Uptown Funk'?", "answer": "Bruno Mars"},
+        {"question": "What is Taylor Swift’s first album called?", "answer": "Taylor Swift"},
+        {"question": "Which rock band is known for the song 'Stairway to Heaven'?", "answer": "Led Zeppelin"},
+        {"question": "What is the stage name of Robyn Fenty?", "answer": "Rihanna"},
+        {"question": "Which festival is known as the biggest music festival in the world?", "answer": "Glastonbury"},
+        {"question": "Which K-pop group released 'Dynamite'?", "answer": "BTS"},
+        {"question": "What genre of music is associated with Bob Marley?", "answer": "Reggae"}
+    ]
+
+def jeopardy_questions_game():                     #All the jeopardy questions is stored in here
+    return [
+        {"question": "This U.S. state is known as the 'Sunshine State'.", "answer": "What is Florida?"},
+        {"question": "This famous scientist developed the theory of relativity.", "answer": "Who is Albert Einstein?"},
+        {"question": "This planet is the closest to the Sun.", "answer": "What is Mercury?"},
+        {"question": "This author wrote *Romeo and Juliet*.", "answer": "Who is William Shakespeare?"},
+        {"question": "This musical instrument has 88 keys.", "answer": "What is a piano?"},
+        {"question": "This city is the capital of Japan.", "answer": "What is Tokyo?"},
+        {"question": "This painter is known for the *Mona Lisa*.", "answer": "Who is Leonardo da Vinci?"},
+        {"question": "This is the chemical symbol for water.", "answer": "What is H2O?"},
+        {"question": "This U.S. President appears on the $5 bill.", "answer": "Who is Abraham Lincoln?"},
+        {"question": "This is the largest ocean on Earth.", "answer": "What is the Pacific Ocean?"},
+        {"question": "This is the hardest natural substance on Earth.", "answer": "What is a diamond?"},
+        {"question": "This band performed the song *Bohemian Rhapsody*.", "answer": "Who is Queen?"},
+        {"question": "This holiday is celebrated on July 4th in the U.S.", "answer": "What is Independence Day?"},
+        {"question": "This is the capital of France.", "answer": "What is Paris?"},
+        {"question": "This animal is the fastest land animal.", "answer": "What is a cheetah?"},
+        {"question": "This sport is played at Wimbledon.", "answer": "What is tennis?"},
+        {"question": "This author wrote *Harry Potter*.", "answer": "Who is J.K. Rowling?"},
+        {"question": "This gas makes up most of Earth’s atmosphere.", "answer": "What is nitrogen?"},
+        {"question": "This social media platform was founded by Mark Zuckerberg.", "answer": "What is Facebook?"},
+        {"question": "This island nation is home to the Great Barrier Reef.", "answer": "What is Australia?"}
+    ]
+
+
+# Ask for username
+username = input("Enter your username: ").strip()
+print(f"Welcome, {username} to The Quiz Game!\n")
+
+# Choose a quiz type
+choice = input("What Quiz game do you want to play?: \n(M)ixed questions, (S)ong questions, or (J)eopardy? ").lower()
+
+if choice == "m":
+    print("You have chosen mixed questions!")
+    trivia = mixed_questions_game()
+    game_type = "Mixed"
+    
+elif choice == "s":
+    print("You have chosen song questions!")
+    trivia = music_questions_game()
+    game_type = "Music"
+
+elif choice == "j":
+    print("You have chosen Jeopardy-style questions!")
+    print("\n")
+    print("Please remember to phrase the answers in **What/Who is** format with a **?** at the end.")
+    print("\n")
+    trivia = jeopardy_questions_game()
+    game_type = "Jeopardy"
+
+else:
+    print("Invalid answer")
+    exit()
+
+random.shuffle(trivia)  # Shuffle questions
+score = 0  # Track correct answers
+
+for item in trivia:
+    user_answer = input(f"Q: {item['question']} ").strip()
+    if user_answer.lower() == str(item['answer']).lower():
+        print("✅ Correct!")
+        score += 1
+    else:
+        print(f"❌ Wrong! The correct answer is: {item['answer']}")
+
+# Display final score with username
+print(f"\n🎉 {username}, the game is over! You got {score} out of {len(trivia)} correct.")
+
+# Save the high score to the file
+save_highscore(username, f"{score}/20", game_type)  # Pass the game type (Mixed, Music, Jeopardy)
+
+
